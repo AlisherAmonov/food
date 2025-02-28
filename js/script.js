@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
   // Tabs
 
   const tabs = document.querySelectorAll('.tabheader__item')
@@ -48,32 +47,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const total = Date.parse(endtime) - Date.parse(new Date())
 
     if (total <= 0) {
-        days = 0
-        hours = 0
-        minutes = 0
-        seconds = 0
+      days = 0
+      hours = 0
+      minutes = 0
+      seconds = 0
     } else {
-        days = Math.floor(total / (1000 * 60 * 60 * 24))
-        hours = Math.floor((total / (1000 * 60 * 60)) % 24)
-        minutes = Math.floor ((total / 1000 / 60) % 60)
-        seconds = Math.floor((total / 1000) % 60)
+      days = Math.floor(total / (1000 * 60 * 60 * 24))
+      hours = Math.floor((total / (1000 * 60 * 60)) % 24)
+      minutes = Math.floor((total / 1000 / 60) % 60)
+      seconds = Math.floor((total / 1000) % 60)
     }
 
-
     return {
-        total,
-        days,
-        hours,
-        minutes,
-        seconds
+      total,
+      days,
+      hours,
+      minutes,
+      seconds,
     }
   }
 
   function getZero(num) {
     if (num >= 0 && num < 10) {
-        return `0${num}`
+      return `0${num}`
     } else {
-        return num
+      return num
     }
   }
 
@@ -89,19 +87,69 @@ document.addEventListener('DOMContentLoaded', () => {
     updateClock()
 
     function updateClock() {
-        const t = getTimeRemaining(endtime)
+      const t = getTimeRemaining(endtime)
 
-        days.innerHTML = getZero(t.days)
-        hours.innerHTML = getZero(t.hours)
-        minutes.innerHTML = getZero(t.minutes)
-        seconds.innerHTML = getZero(t.seconds)
+      days.innerHTML = getZero(t.days)
+      hours.innerHTML = getZero(t.hours)
+      minutes.innerHTML = getZero(t.minutes)
+      seconds.innerHTML = getZero(t.seconds)
 
-        if (t.total <= 0) {
-            clearInterval(timeInterval)
-        }
+      if (t.total <= 0) {
+        clearInterval(timeInterval)
+      }
     }
   }
-  
+
   setClock('.timer', deadline)
-  
+
+  // Modal
+
+  const modal = document.querySelector('.modal')
+  const modalTrigger = document.querySelectorAll('[data-modal]')
+  const modalCloseBtn = document.querySelector('[data-close]')
+
+  function openModal() {
+    modal.classList.add('show')
+    modal.classList.remove('hide')
+    document.body.style.overflow = 'hidden'
+    clearInterval(modalTimerId)
+  }
+
+  modalTrigger.forEach((btn) => {
+    btn.addEventListener('click', openModal)
+  })
+
+  function closeModal() {
+    modal.classList.add('hide')
+    modal.classList.remove('show')
+    document.body.style.overflow = ''
+  }
+
+  modalCloseBtn.addEventListener('click', closeModal)
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal()
+    }
+  })
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape' && modal.classList.contains('show')) {
+      closeModal()
+    }
+  })
+
+  const modalTimerId = setTimeout(openModal, 5000)
+
+  function showModalByScroll() {
+    if (
+      window.scrollY + document.documentElement.clientHeight >=
+      document.documentElement.scrollHeight
+    ) {
+      openModal()
+    }
+    window.removeEventListener('scroll', showModalByScroll)
+  }
+
+  window.addEventListener('scroll', showModalByScroll)
 })
